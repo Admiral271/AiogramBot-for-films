@@ -1,3 +1,3 @@
-from . import start, search
+from . import start, search, instruction
 
-routes = [start.router, search.router]
+routes = [start.router, search.router, instruction.router]
