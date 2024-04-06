@@ -15,22 +15,15 @@ async def process_callback(query: types.CallbackQuery):
         await prev_page(query)
 
 async def next_page(query: types.CallbackQuery):
-    kp_api.current_page += 1
-    results = await kp_api.search_movies()
-    if results:
-        inline_kb = create_movie_buttons(results)
+    if kp_api.current_index + 10 < len(kp_api.results):
+        kp_api.current_index += 10
+        results = kp_api.results[kp_api.current_index:kp_api.current_index+10]
+        inline_kb = create_movie_buttons(results, kp_api.current_index, len(kp_api.results))
         await query.message.edit_text("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)
-    else:
-        await query.message.answer("К сожалению, на следующей странице ничего не найдено.")
 
 async def prev_page(query: types.CallbackQuery):
-    if kp_api.current_page > 1:
-        kp_api.current_page -= 1
-        results = await kp_api.search_movies()
-        if results:
-            inline_kb = create_movie_buttons(results)
-            await query.message.edit_text("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)
-        else:
-            await query.message.answer("К сожалению, на предыдущей странице ничего не найдено.")
-    else:
-        await query.message.answer("Вы находитесь на первой странице.")
+    if kp_api.current_index >= 10:
+        kp_api.current_index -= 10
+        results = kp_api.results[kp_api.current_index:kp_api.current_index+10]
+        inline_kb = create_movie_buttons(results, kp_api.current_index, len(kp_api.results))
+        await query.message.edit_text("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)

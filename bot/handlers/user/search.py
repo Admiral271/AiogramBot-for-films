@@ -1,4 +1,6 @@
+from typing import Optional, List, Dict
 from aiogram import Router, F, types
+import aiohttp
 
 from bot.api import KinoPoiskAPI
 from bot.keyboards.inline import create_movie_buttons
@@ -14,10 +16,12 @@ async def search_by_name(message: types.Message):
 @router.message()
 async def get_search_results(message: types.Message):
     query = message.text
-    kp_api.last_query = query 
-    results = await kp_api.search_movies(query)
-    if results:  
-        inline_kb = create_movie_buttons(results)
-        await message.answer("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)
-    else:
-        await message.answer("К сожалению, по вашему запросу ничего не найдено.")
+    try:
+        results = await kp_api.search_movies(query)
+        if results:  
+            inline_kb = create_movie_buttons(results, kp_api.current_index, len(kp_api.results))
+            await message.answer("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)
+        else:
+            await message.answer("К сожалению, по вашему запросу ничего не найдено.")
+    except Exception as e:
+        await message.answer("Произошла ошибка при поиске. Пожалуйста, попробуйте еще раз.")
