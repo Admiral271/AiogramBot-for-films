@@ -1,11 +1,14 @@
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message
+import logging
 
 router = Router()
+logger = logging.getLogger(__name__)
 
 @router.message(F.text.lower() == 'инструкция')
 async def get_instruction(message: Message):
+    logger.info("Обработчик get_instruction вызван")
     text = """
         <b>Как загрузить видео в телефон, планшет или компьютер для просмотра без интернета?</b>
 
@@ -43,3 +46,4 @@ async def get_instruction(message: Message):
         parse_mode="html",
         disable_web_page_preview=True
     )
+    logger.info("Обработчик get_instruction завершил работу")

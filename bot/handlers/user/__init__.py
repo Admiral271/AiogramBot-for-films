@@ -1,3 +1,3 @@
-from . import start, search, instruction, pages
+from . import callback, start, search, instruction
 
-routes = [start.router, search.router, instruction.router, pages.router]
+routes = [start.router, search.router, instruction.router, callback.router]

@@ -22,9 +22,9 @@ def create_movie_buttons(results, current_index, total_results) -> InlineKeyboar
         kb.row(InlineKeyboardButton(text=button_text, callback_data=callback_data))
     navigation_buttons = []
     if current_index >= 10:
-        navigation_buttons.append(InlineKeyboardButton(text="« Назад", callback_data="prev_page"))
+        navigation_buttons.append(InlineKeyboardButton(text="« Назад", callback_data="pages:prev_page"))
     if current_index + 10 < total_results:
-        navigation_buttons.append(InlineKeyboardButton(text="Далее »", callback_data="next_page"))
+        navigation_buttons.append(InlineKeyboardButton(text="Далее »", callback_data="pages:next_page"))
     if navigation_buttons:
         kb.row(*navigation_buttons)
     return kb.as_markup()

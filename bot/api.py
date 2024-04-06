@@ -24,9 +24,9 @@ class KinoPoiskAPI:
                 if response.status == 200:
                     json_response = await response.json()
                     self.results = json_response["docs"]
-                    logger.info(f"Received {len(self.results)} results for query '{query}'")
+                    logger.info(f"Получено {len(self.results)} результатов по запросу '{query}'")
                 else:
-                    logger.warning(f"Request to {url} returned status code {response.status}")
+                    logger.warning(f"Запрос к {url} вернул код статуса {response.status}")
         return self.results[self.current_index:self.current_index+10]
     
 class KinoClubAPI:
