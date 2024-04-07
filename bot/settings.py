@@ -1,5 +1,5 @@
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 
 class Settings(BaseSettings):
@@ -9,5 +9,6 @@ class Settings(BaseSettings):
     kinoclub_token: str = Field(..., alias='KINOCLUB_TOKEN')
     chat_url: str = Field(..., alias='CHAT_URL')
     chat_id: str = Field(..., alias='CHAT_ID')
+
 
 settings = Settings()
