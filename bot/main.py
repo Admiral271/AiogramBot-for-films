@@ -1,5 +1,8 @@
 import logging
 import asyncio
+
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from aiogram import Bot, Dispatcher
 
 from bot.settings import settings
@@ -10,7 +13,9 @@ logging.getLogger('aiogram.event').setLevel(logging.CRITICAL)
 
 
 async def main():
-    bot = Bot(token=settings.tg_token)
+    api_backend = TelegramAPIServer.from_base("http://telegram-bot-api:8081", is_local=True)
+
+    bot = Bot(token=settings.tg_token, session=AiohttpSession(api=api_backend))
     dp = Dispatcher()
 
     dp.include_routers(*user.routes)

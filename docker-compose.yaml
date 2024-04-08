@@ -7,8 +7,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
-      telegram-bot-api:
-        condition: service_healthy
+      - telegram-bot-api
     env_file:
       - .env
 

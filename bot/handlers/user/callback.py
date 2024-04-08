@@ -1,6 +1,6 @@
+from pathlib import Path
 import subprocess
 import logging
-import os
 
 from aiogram import Router, types, Bot
 
@@ -62,25 +62,35 @@ async def process_movie_callback(query: types.CallbackQuery, bot: Bot):
         # Отправить сообщение пользователю о начале процесса загрузки
         await query.message.answer("Начинаю загрузку видео...")
 
-        if not os.path.exists("tempfiles"):
-            os.makedirs("tempfiles")
+        tempfolder = Path("tempfiles").resolve()
+        if not tempfolder.exists():
+            tempfolder.mkdir(0o666, exist_ok=True)
 
+        file_path = tempfolder / f"{movie_id}.mp4"
         # Загрузить и преобразовать файл
-        process = subprocess.run([
-            "yt-dlp", "--concurrent-fragments", "16", "--no-progress", "--user-agent",
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36",
-            "-o", f"tempfiles/{movie_id}.mp4", movie.download_url
-        ])
-        logger.info(f"YT-DLP exit: {process.returncode}")
+        try:
+            process = subprocess.run([
+                "yt-dlp", "--concurrent-fragments", "16", "--no-progress", "--user-agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.80 Safari/537.36",
+                "-o", str(file_path), str(movie.download_url)
+            ])
+            logger.info(f"YT-DLP exit: {process.returncode}")
+        except Exception as ex:
+            logger.info(str(ex))
 
         # Отправить файл пользователю
         await query.message.answer("Файл загружен, отправляю")
-
-        file = types.FSInputFile(f"tempfiles/{movie_id}.mp4", f"{movie.name}.mp4")
-        await bot.send_video(chat_id=query.chat_instance, video=file)
+        logger.info(f"Files: {list(tempfolder.glob('*.*'))}")
+        try:
+            file = types.FSInputFile(path=file_path, filename=f"{movie.name}.mp4")
+            file_id = await query.message.answer_video(video=file)
+            logger.info(f"FileID: {file_id}")
+        except Exception as ex:
+            logger.info(str(ex))
+            logger.exception(str(ex))
 
         # Удалить временный файл
-        os.remove(f"tempfiles/{movie_id}.mp4")
+        file_path.unlink(missing_ok=True)
 
     elif movie.type == "serial":
         seasons_dict = {}
@@ -94,4 +104,4 @@ async def process_movie_callback(query: types.CallbackQuery, bot: Bot):
 
     logger.info(
         f"Обработчик process_movie_callback отправил сообщение с информацией о '{movie.name}' (id:{movie.id})")
-    await query.message.answer_photo(photo=movie.poster, caption=message_text, parse_mode="html")
+    await query.message.answer_photo(photo=str(movie.poster), caption=message_text, parse_mode="html")

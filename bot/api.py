@@ -17,7 +17,7 @@ class KinoPoiskAPI:
         self.results = []
         self.current_index = 0
 
-    async def search_movies(self, query: str) -> Optional[List[Dict]]:
+    async def search_movies(self, query: str) -> list[dict]:
         self.results = []
         url = f"{self.BASE_URL}{self.SEARCH_ENDPOINT}"
         params = {"page": 1, "limit": 50, "query": query}
@@ -25,14 +25,17 @@ class KinoPoiskAPI:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers, params=params) as response:
-                if response.status == 200:
-                    json_response = await response.json()
-                    self.results = json_response["docs"]
-                    logger.info(f"Получено {len(self.results)} результатов по запросу '{query}'")
-                else:
+                if response.status != 200:
                     logger.warning(f"Запрос к {url} вернул код статуса {response.status}")
-        return self.results[self.current_index:self.current_index+10]
-    
+                    return self.results
+
+                json_response = await response.json()
+                self.results = json_response.get("docs", [])
+                logger.info(f"Получено {len(self.results)} результатов по запросу '{query}'")
+
+        return self.results[self.current_index: self.current_index + 10]
+
+
 class KinoClubAPI:
     def __init__(self, token):
         self.token = token

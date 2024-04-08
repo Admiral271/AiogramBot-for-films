@@ -28,7 +28,7 @@ async def get_search_results(message: types.Message):
             await message.answer("К сожалению, по вашему запросу ничего не найдено.")
             return
 
-        inline_kb = create_movie_buttons(results, kp_api.current_index)
+        inline_kb = create_movie_buttons(results, kp_api.current_index, len(kp_api.results))
         await message.answer("Выберите фильм или сериал из списка ниже:", reply_markup=inline_kb)
 
     except Exception as e:
