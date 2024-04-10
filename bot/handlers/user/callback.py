@@ -83,7 +83,7 @@ async def process_movie_callback(query: types.CallbackQuery, bot: Bot):
         logger.info(f"Files: {list(tempfolder.glob('*.*'))}")
         try:
             file = types.FSInputFile(path=file_path, filename=f"{movie.name}.mp4")
-            file_id = await query.message.answer_video(video=file)
+            file_id = await query.message.answer_video(video=file, supports_streaming=True)
             logger.info(f"FileID: {file_id}")
         except Exception as ex:
             logger.info(str(ex))
