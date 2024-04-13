@@ -86,7 +86,6 @@ async def process_movie_callback(query: types.CallbackQuery, bot: Bot):
             file_id = await query.message.answer_video(video=file, supports_streaming=True)
             logger.info(f"FileID: {file_id}")
         except Exception as ex:
-            logger.info(str(ex))
             logger.exception(str(ex))
 
         # Удалить временный файл
